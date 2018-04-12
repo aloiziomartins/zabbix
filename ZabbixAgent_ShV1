@@ -1,0 +1,44 @@
+#!/bin/bash
+# 
+#VersÃ£o=1
+# 
+# Script de instalaÃ§Ã£o do zabbix Cliente
+
+ echo instalando
+
+	# Criando o diretÃ³rio de instalaÃ§Ã£o e download dos binÃ¡rios zabbix
+   	#biblioteca para compilar binÃ¡rio
+    	apt-get install make gcc
+	mkdir /opt/zabbix && cd /opt/zabbix/ "$ERRO"
+	wget http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix/zabbix_3.2.3.orig.tar.gz
+	tar -xzvf zabbix_3.2.3.orig.tar.gz
+    cd zabbix-3.2.3/
+    ./configure --enable-agent
+    make install
+    
+    
+    #usuÃ¡rio
+    echo  adicionando usuÃ¡rio...
+	adduser zabbix --shell /bin/false
+    #permissÃ£o
+    echo permissÃ£o para usuÃ¡rio
+    chown zabbix:zabbix /usr/local/etc/zabbix_agentd.conf
+    
+    
+    #copiar para local certo
+    cp misc/init.d/debian/zabbix-agent /etc/init.d/
+    
+    mv /usr/local/etc/zabbix_agentd.conf /usr/local/etc/zabbix_agentd.conf.bkp
+    
+    
+    echo  criando arquivo de config...
+    cd /usr/local/etc/
+    wget https://raw.githubusercontent.com/aloiziomartins/zabbix/master/zabbix_agentd.conf      
+
+
+    echo  startando...
+    service /etc/init.d/zabbix-agent restart
+
+    echo  colocando para iniciar junto com OS..
+    update-rc.d zabbix-agent defaults
+
